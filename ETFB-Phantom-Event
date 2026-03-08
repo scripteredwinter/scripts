@@ -1,0 +1,321 @@
+local T = game:GetService("TweenService")
+
+local C = {
+    BG = Color3.fromRGB(12, 18, 28),
+    SF = Color3.fromRGB(18, 27, 42),
+    PR = Color3.fromRGB(100, 181, 246),
+    SC = Color3.fromRGB(129, 212, 250),
+    AC = Color3.fromRGB(66, 165, 245),
+    TX = Color3.fromRGB(255, 255, 255),
+    TS = Color3.fromRGB(176, 190, 210),
+    GR1 = Color3.fromRGB(25, 118, 210),
+    GR2 = Color3.fromRGB(13, 71, 161),
+    RD = Color3.fromRGB(220, 60, 60),
+}
+
+local g = Instance.new("ScreenGui", game.CoreGui)
+g.ResetOnSpawn = false
+g.Name = "WinterExpiredGui"
+
+local FRAME_W_SCALE = 0.72
+
+-- ── Floating particles ──
+local function spawnParticle()
+    local p = Instance.new("Frame", g)
+    local size = math.random(2, 5)
+    p.Size = UDim2.fromOffset(size, size)
+    p.Position = UDim2.new(math.random(), 0, 1.05, 0)
+    p.BackgroundColor3 = math.random() > 0.5 and C.PR or C.SC
+    p.BackgroundTransparency = math.random(65, 88) / 100
+    p.BorderSizePixel = 0
+    p.ZIndex = 0
+    Instance.new("UICorner", p).CornerRadius = UDim.new(1, 0)
+    T:Create(p, TweenInfo.new(math.random(7, 13), Enum.EasingStyle.Linear), {
+        Position = UDim2.new(math.random(), 0, -0.05, 0),
+        BackgroundTransparency = 1
+    }):Play()
+    task.delay(13, function() if p and p.Parent then p:Destroy() end end)
+end
+
+task.spawn(function()
+    while g and g.Parent do spawnParticle() task.wait(0.5) end
+end)
+
+-- ── Main Frame ──
+local f = Instance.new("Frame", g)
+f.Size = UDim2.new(FRAME_W_SCALE, 0, 0, 0)
+f.Position = UDim2.fromScale(0.5, 0.5)
+f.AnchorPoint = Vector2.new(0.5, 0.5)
+f.BackgroundColor3 = C.BG
+f.BackgroundTransparency = 0.08
+f.BorderSizePixel = 0
+f.Active = true
+f.Draggable = true
+f.ClipsDescendants = true
+Instance.new("UICorner", f).CornerRadius = UDim.new(0, 16)
+
+local grad = Instance.new("UIGradient", f)
+grad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(15, 25, 40)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(12, 20, 35)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 15, 25))
+}
+grad.Rotation = 135
+grad.Transparency = NumberSequence.new{
+    NumberSequenceKeypoint.new(0, 0.12),
+    NumberSequenceKeypoint.new(1, 0.04)
+}
+
+local bgTile = Instance.new("ImageLabel", f)
+bgTile.Size = UDim2.fromScale(1, 1)
+bgTile.BackgroundTransparency = 1
+bgTile.Image = "rbxassetid://6724808282"
+bgTile.ImageColor3 = C.PR
+bgTile.ImageTransparency = 0.92
+bgTile.ScaleType = Enum.ScaleType.Tile
+bgTile.TileSize = UDim2.fromOffset(512, 512)
+bgTile.ZIndex = 0
+Instance.new("UICorner", bgTile).CornerRadius = UDim.new(0, 16)
+
+task.spawn(function()
+    while bgTile and bgTile.Parent do
+        T:Create(bgTile, TweenInfo.new(20, Enum.EasingStyle.Linear), {TileSize = UDim2.fromOffset(612, 612)}):Play()
+        task.wait(20)
+        bgTile.TileSize = UDim2.fromOffset(512, 512)
+    end
+end)
+
+local crvL = Instance.new("ImageLabel", f)
+crvL.Size = UDim2.new(0.35, 0, 1, 0)
+crvL.Position = UDim2.new(-0.17, 0, 0, 0)
+crvL.BackgroundTransparency = 1
+crvL.Image = "rbxassetid://6724808282"
+crvL.ImageColor3 = C.PR
+crvL.ImageTransparency = 0.82
+crvL.ZIndex = 0
+
+local crvR = Instance.new("ImageLabel", f)
+crvR.Size = UDim2.new(0.35, 0, 1, 0)
+crvR.Position = UDim2.new(0.82, 0, 0, 0)
+crvR.BackgroundTransparency = 1
+crvR.Image = "rbxassetid://6724808282"
+crvR.ImageColor3 = C.SC
+crvR.ImageTransparency = 0.82
+crvR.ZIndex = 0
+
+-- ── Header ──
+local header = Instance.new("Frame", f)
+header.Size = UDim2.new(1, 0, 0, 44)
+header.BackgroundColor3 = C.SF
+header.BackgroundTransparency = 0.5
+header.BorderSizePixel = 0
+
+local headerGrad = Instance.new("UIGradient", header)
+headerGrad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, C.GR1),
+    ColorSequenceKeypoint.new(1, C.GR2)
+}
+headerGrad.Rotation = 90
+headerGrad.Transparency = NumberSequence.new{
+    NumberSequenceKeypoint.new(0, 0.55),
+    NumberSequenceKeypoint.new(1, 0.72)
+}
+
+local snowflake = Instance.new("TextLabel", header)
+snowflake.Size = UDim2.fromOffset(30, 30)
+snowflake.Position = UDim2.fromOffset(12, 7)
+snowflake.BackgroundColor3 = C.SF
+snowflake.BackgroundTransparency = 0.3
+snowflake.Text = "❄️"
+snowflake.TextSize = 16
+snowflake.Font = Enum.Font.GothamBold
+snowflake.TextXAlignment = Enum.TextXAlignment.Center
+snowflake.BorderSizePixel = 0
+Instance.new("UICorner", snowflake).CornerRadius = UDim.new(1, 0)
+
+local headerTitle = Instance.new("TextLabel", header)
+headerTitle.Size = UDim2.new(1, -52, 1, 0)
+headerTitle.Position = UDim2.fromOffset(48, 0)
+headerTitle.BackgroundTransparency = 1
+headerTitle.Text = "Winter Scripts ❄️"
+headerTitle.TextColor3 = C.TX
+headerTitle.TextSize = 15
+headerTitle.Font = Enum.Font.GothamBold
+headerTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+local headerTitleGrad = Instance.new("UIGradient", headerTitle)
+headerTitleGrad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, C.SC),
+    ColorSequenceKeypoint.new(1, C.PR)
+}
+headerTitleGrad.Rotation = 45
+
+-- ── Body — tight padding, no gaps ──
+local body = Instance.new("Frame", f)
+body.Size = UDim2.new(1, -24, 0, 0)
+body.Position = UDim2.fromOffset(12, 52)
+body.BackgroundTransparency = 1
+
+local bodyLayout = Instance.new("UIListLayout", body)
+bodyLayout.Padding = UDim.new(0, 6)        -- tight uniform gap between all items
+bodyLayout.FillDirection = Enum.FillDirection.Vertical
+bodyLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- ── Warning banner — CENTERED text layout ──
+local warnBanner = Instance.new("Frame", body)
+warnBanner.Size = UDim2.new(1, 0, 0, 60)
+warnBanner.BackgroundColor3 = C.RD
+warnBanner.BackgroundTransparency = 0.75
+warnBanner.BorderSizePixel = 0
+Instance.new("UICorner", warnBanner).CornerRadius = UDim.new(0, 10)
+
+local warnGrad = Instance.new("UIGradient", warnBanner)
+warnGrad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(200, 50, 50)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(120, 20, 20))
+}
+warnGrad.Rotation = 45
+warnGrad.Transparency = NumberSequence.new{
+    NumberSequenceKeypoint.new(0, 0.58),
+    NumberSequenceKeypoint.new(1, 0.78)
+}
+
+-- Centered warning icon
+local warnIcon = Instance.new("TextLabel", warnBanner)
+warnIcon.Size = UDim2.new(1, 0, 0, 30)
+warnIcon.Position = UDim2.fromOffset(0, 6)
+warnIcon.BackgroundTransparency = 1
+warnIcon.Text = "⚠️  Script Under Progress"
+warnIcon.TextColor3 = Color3.fromRGB(255, 110, 110)
+warnIcon.TextSize = 19
+warnIcon.Font = Enum.Font.GothamBold
+warnIcon.TextXAlignment = Enum.TextXAlignment.Center  -- CENTERED
+
+local expiredSub = Instance.new("TextLabel", warnBanner)
+expiredSub.Size = UDim2.new(1, 0, 0, 18)
+expiredSub.Position = UDim2.fromOffset(0, 36)
+expiredSub.BackgroundTransparency = 1
+expiredSub.Text = "Just wait few hours, script is under maintenance for new update."
+expiredSub.TextColor3 = Color3.fromRGB(255, 255, 255)
+expiredSub.TextSize = 12
+expiredSub.Font = Enum.Font.GothamMedium
+expiredSub.TextXAlignment = Enum.TextXAlignment.Center  -- CENTERED
+
+-- ── Update instruction card ──
+local infoCard = Instance.new("Frame", body)
+infoCard.Size = UDim2.new(1, 0, 0, 80)
+infoCard.BackgroundColor3 = C.SF
+infoCard.BackgroundTransparency = 0.4
+infoCard.BorderSizePixel = 0
+Instance.new("UICorner", infoCard).CornerRadius = UDim.new(0, 10)
+
+local infoGrad = Instance.new("UIGradient", infoCard)
+infoGrad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(18, 30, 50)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(12, 20, 35))
+}
+infoGrad.Rotation = 135
+
+local updateTitle = Instance.new("TextLabel", infoCard)
+updateTitle.Size = UDim2.new(1, -20, 0, 22)
+updateTitle.Position = UDim2.fromOffset(12, 7)
+updateTitle.BackgroundTransparency = 1
+updateTitle.Text = "🔄  Updating New Features"
+updateTitle.TextColor3 = C.SC
+updateTitle.TextSize = 14
+updateTitle.Font = Enum.Font.GothamBold
+updateTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+local updateDesc = Instance.new("TextLabel", infoCard)
+updateDesc.Size = UDim2.new(1, -20, 0, 42)
+updateDesc.Position = UDim2.fromOffset(12, 31)
+updateDesc.BackgroundTransparency = 1
+updateDesc.Text = "Soon phantom event script will be added, just execute this script after some time, sorry for the delay!"
+updateDesc.TextColor3 = Color3.fromRGB(255, 255, 255)
+updateDesc.TextSize = 13
+updateDesc.Font = Enum.Font.GothamBold
+updateDesc.TextXAlignment = Enum.TextXAlignment.Left
+updateDesc.TextWrapped = true
+
+-- ── YouTube button — bigger text, full white ──
+local ytBtn = Instance.new("TextButton", body)
+ytBtn.Size = UDim2.new(1, 0, 0, 52)       -- full width, taller for bigger text
+ytBtn.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
+ytBtn.BackgroundTransparency = 0.1
+ytBtn.Text = "▶   PHANTOM SCRIPT SOON"
+ytBtn.TextColor3 = Color3.fromRGB(255, 255, 255)   -- pure white
+ytBtn.TextSize = 20                                 -- bigger
+ytBtn.Font = Enum.Font.GothamBold
+ytBtn.BorderSizePixel = 0
+ytBtn.AutoButtonColor = false
+Instance.new("UICorner", ytBtn).CornerRadius = UDim.new(0, 12)
+
+local ytGrad = Instance.new("UIGradient", ytBtn)
+ytGrad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(230, 55, 55)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(155, 20, 20))
+}
+ytGrad.Rotation = 45
+
+ytBtn.MouseEnter:Connect(function()
+    T:Create(ytBtn, TweenInfo.new(0.18), {BackgroundTransparency = 0.0}):Play()
+end)
+ytBtn.MouseLeave:Connect(function()
+    T:Create(ytBtn, TweenInfo.new(0.18), {BackgroundTransparency = 0.1}):Play()
+end)
+
+ytBtn.MouseButton1Click:Connect(function()
+    pcall(function() setclipboard("https://www.youtube.com/@TheWinterScripts") end)
+    ytBtn.Text = "✅   YT Link Copied to Clipboard!"
+    ytBtn.BackgroundColor3 = Color3.fromRGB(35, 155, 75)
+    ytGrad.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(55, 180, 90)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 120, 50))
+    }
+    task.wait(2.5)
+    ytBtn.Text = "▶   Check New Updates"
+    ytBtn.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
+    ytGrad.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(230, 55, 55)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(155, 20, 20))
+    }
+end)
+
+-- ── Bottom spacer ──
+local spacer = Instance.new("Frame", body)
+spacer.Size = UDim2.new(1, 0, 0, 4)
+spacer.BackgroundTransparency = 1
+
+-- ── Auto-size height ──
+local function updateSize()
+    local contentH = bodyLayout.AbsoluteContentSize.Y
+    local totalH = 52 + contentH + 10
+    f.Size = UDim2.new(FRAME_W_SCALE, 0, 0, totalH)
+    body.Size = UDim2.new(1, -24, 0, contentH)
+end
+
+bodyLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateSize)
+
+-- ── Entrance animation ──
+f.Size = UDim2.new(FRAME_W_SCALE, 0, 0, 0)
+f.BackgroundTransparency = 1
+f.Position = UDim2.new(0.5, 0, 1.5, 0)
+
+task.wait(0.12)
+updateSize()
+local targetH = 52 + bodyLayout.AbsoluteContentSize.Y + 10
+T:Create(f, TweenInfo.new(0.65, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Size = UDim2.new(FRAME_W_SCALE, 0, 0, targetH),
+    Position = UDim2.fromScale(0.5, 0.5),
+    BackgroundTransparency = 0.08
+}):Play()
+
+-- ── Pulse warning banner ──
+task.spawn(function()
+    while warnBanner and warnBanner.Parent do
+        T:Create(warnBanner, TweenInfo.new(1.1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundTransparency = 0.58}):Play()
+        task.wait(1.1)
+        T:Create(warnBanner, TweenInfo.new(1.1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundTransparency = 0.82}):Play()
+        task.wait(1.1)
+    end
+end)
