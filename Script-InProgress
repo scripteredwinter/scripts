@@ -51,7 +51,8 @@ f.BackgroundTransparency = 0.08
 f.BorderSizePixel = 0
 f.Active = true
 f.Draggable = true
-f.ClipsDescendants = true
+f.ClipsDescendants = false   -- must be false so AutomaticSize works outward
+f.AutomaticSize = Enum.AutomaticSize.Y  -- frame grows vertically with content
 Instance.new("UICorner", f).CornerRadius = UDim.new(0, 16)
 
 local grad = Instance.new("UIGradient", f)
@@ -150,23 +151,31 @@ headerTitleGrad.Color = ColorSequence.new{
 }
 headerTitleGrad.Rotation = 45
 
--- ── Body — tight padding, no gaps ──
+-- ── Body — auto-sizes vertically ──
 local body = Instance.new("Frame", f)
 body.Size = UDim2.new(1, -24, 0, 0)
 body.Position = UDim2.fromOffset(12, 52)
 body.BackgroundTransparency = 1
+body.AutomaticSize = Enum.AutomaticSize.Y  -- grows with children
 
 local bodyLayout = Instance.new("UIListLayout", body)
-bodyLayout.Padding = UDim.new(0, 6)        -- tight uniform gap between all items
+bodyLayout.Padding = UDim.new(0, 6)
 bodyLayout.FillDirection = Enum.FillDirection.Vertical
 bodyLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+bodyLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
--- ── Warning banner — CENTERED text layout ──
+-- bottom padding inside body
+local bodyPad = Instance.new("UIPadding", body)
+bodyPad.PaddingBottom = UDim.new(0, 10)
+
+-- ── Warning banner — auto-height ──
 local warnBanner = Instance.new("Frame", body)
-warnBanner.Size = UDim2.new(1, 0, 0, 60)
+warnBanner.Size = UDim2.new(1, 0, 0, 0)
+warnBanner.AutomaticSize = Enum.AutomaticSize.Y   -- grows with text
 warnBanner.BackgroundColor3 = C.RD
 warnBanner.BackgroundTransparency = 0.75
 warnBanner.BorderSizePixel = 0
+warnBanner.LayoutOrder = 1
 Instance.new("UICorner", warnBanner).CornerRadius = UDim.new(0, 10)
 
 local warnGrad = Instance.new("UIGradient", warnBanner)
@@ -180,33 +189,53 @@ warnGrad.Transparency = NumberSequence.new{
     NumberSequenceKeypoint.new(1, 0.78)
 }
 
--- Centered warning icon
+-- inner layout for warn banner content
+local warnLayout = Instance.new("UIListLayout", warnBanner)
+warnLayout.Padding = UDim.new(0, 2)
+warnLayout.FillDirection = Enum.FillDirection.Vertical
+warnLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+warnLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local warnPad = Instance.new("UIPadding", warnBanner)
+warnPad.PaddingTop = UDim.new(0, 8)
+warnPad.PaddingBottom = UDim.new(0, 8)
+warnPad.PaddingLeft = UDim.new(0, 10)
+warnPad.PaddingRight = UDim.new(0, 10)
+
+-- Title row
 local warnIcon = Instance.new("TextLabel", warnBanner)
-warnIcon.Size = UDim2.new(1, 0, 0, 30)
-warnIcon.Position = UDim2.fromOffset(0, 6)
+warnIcon.Size = UDim2.new(1, 0, 0, 0)
+warnIcon.AutomaticSize = Enum.AutomaticSize.Y
 warnIcon.BackgroundTransparency = 1
 warnIcon.Text = "⚠️  Script Under Progress"
 warnIcon.TextColor3 = Color3.fromRGB(255, 110, 110)
 warnIcon.TextSize = 19
 warnIcon.Font = Enum.Font.GothamBold
-warnIcon.TextXAlignment = Enum.TextXAlignment.Center  -- CENTERED
+warnIcon.TextXAlignment = Enum.TextXAlignment.Center
+warnIcon.TextWrapped = true
+warnIcon.LayoutOrder = 1
 
+-- Subtitle — wraps to however many lines needed
 local expiredSub = Instance.new("TextLabel", warnBanner)
-expiredSub.Size = UDim2.new(1, 0, 0, 18)
-expiredSub.Position = UDim2.fromOffset(0, 36)
+expiredSub.Size = UDim2.new(1, 0, 0, 0)
+expiredSub.AutomaticSize = Enum.AutomaticSize.Y
 expiredSub.BackgroundTransparency = 1
-expiredSub.Text = "The escape tsuanmi devs have added many anticheats, no script is working currently, they all have kicking issues."
+expiredSub.Text = "The escape tsunami devs have added many anticheats, no script is working currently, they all have kicking issues."
 expiredSub.TextColor3 = Color3.fromRGB(255, 255, 255)
 expiredSub.TextSize = 12
 expiredSub.Font = Enum.Font.GothamMedium
-expiredSub.TextXAlignment = Enum.TextXAlignment.Center  -- CENTERED
+expiredSub.TextXAlignment = Enum.TextXAlignment.Center
+expiredSub.TextWrapped = true   -- KEY: wraps instead of overflowing
+expiredSub.LayoutOrder = 2
 
--- ── Update instruction card ──
+-- ── Update instruction card — auto-height ──
 local infoCard = Instance.new("Frame", body)
-infoCard.Size = UDim2.new(1, 0, 0, 80)
+infoCard.Size = UDim2.new(1, 0, 0, 0)
+infoCard.AutomaticSize = Enum.AutomaticSize.Y
 infoCard.BackgroundColor3 = C.SF
 infoCard.BackgroundTransparency = 0.4
 infoCard.BorderSizePixel = 0
+infoCard.LayoutOrder = 2
 Instance.new("UICorner", infoCard).CornerRadius = UDim.new(0, 10)
 
 local infoGrad = Instance.new("UIGradient", infoCard)
@@ -216,19 +245,33 @@ infoGrad.Color = ColorSequence.new{
 }
 infoGrad.Rotation = 135
 
+local infoInnerLayout = Instance.new("UIListLayout", infoCard)
+infoInnerLayout.Padding = UDim.new(0, 4)
+infoInnerLayout.FillDirection = Enum.FillDirection.Vertical
+infoInnerLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+infoInnerLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local infoPad = Instance.new("UIPadding", infoCard)
+infoPad.PaddingTop = UDim.new(0, 8)
+infoPad.PaddingBottom = UDim.new(0, 8)
+infoPad.PaddingLeft = UDim.new(0, 12)
+infoPad.PaddingRight = UDim.new(0, 12)
+
 local updateTitle = Instance.new("TextLabel", infoCard)
-updateTitle.Size = UDim2.new(1, -20, 0, 22)
-updateTitle.Position = UDim2.fromOffset(12, 7)
+updateTitle.Size = UDim2.new(1, 0, 0, 0)
+updateTitle.AutomaticSize = Enum.AutomaticSize.Y
 updateTitle.BackgroundTransparency = 1
 updateTitle.Text = "🔄 Trying To Bypass Anticheats"
 updateTitle.TextColor3 = C.SC
 updateTitle.TextSize = 14
 updateTitle.Font = Enum.Font.GothamBold
 updateTitle.TextXAlignment = Enum.TextXAlignment.Left
+updateTitle.TextWrapped = true
+updateTitle.LayoutOrder = 1
 
 local updateDesc = Instance.new("TextLabel", infoCard)
-updateDesc.Size = UDim2.new(1, -20, 0, 42)
-updateDesc.Position = UDim2.fromOffset(12, 31)
+updateDesc.Size = UDim2.new(1, 0, 0, 0)
+updateDesc.AutomaticSize = Enum.AutomaticSize.Y
 updateDesc.BackgroundTransparency = 1
 updateDesc.Text = "Soon updated script will be added, just execute this script after some time, sorry for the delay!"
 updateDesc.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -236,18 +279,20 @@ updateDesc.TextSize = 13
 updateDesc.Font = Enum.Font.GothamBold
 updateDesc.TextXAlignment = Enum.TextXAlignment.Left
 updateDesc.TextWrapped = true
+updateDesc.LayoutOrder = 2
 
--- ── YouTube button — bigger text, full white ──
+-- ── YouTube button ──
 local ytBtn = Instance.new("TextButton", body)
-ytBtn.Size = UDim2.new(1, 0, 0, 52)       -- full width, taller for bigger text
+ytBtn.Size = UDim2.new(1, 0, 0, 52)
 ytBtn.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
 ytBtn.BackgroundTransparency = 0.1
 ytBtn.Text = "▶  SCRIPT ANNOUNCEMENTS HERE"
-ytBtn.TextColor3 = Color3.fromRGB(255, 255, 255)   -- pure white
-ytBtn.TextSize = 20                                 -- bigger
+ytBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ytBtn.TextSize = 18
 ytBtn.Font = Enum.Font.GothamBold
 ytBtn.BorderSizePixel = 0
 ytBtn.AutoButtonColor = false
+ytBtn.LayoutOrder = 3
 Instance.new("UICorner", ytBtn).CornerRadius = UDim.new(0, 12)
 
 local ytGrad = Instance.new("UIGradient", ytBtn)
@@ -266,14 +311,14 @@ end)
 
 ytBtn.MouseButton1Click:Connect(function()
     pcall(function() setclipboard("https://www.youtube.com/@TheWinterScripts") end)
-    ytBtn.Text = "✅   YT Link Copied to Clipboard!"
+    ytBtn.Text = "✅  YT Link Copied to Clipboard!"
     ytBtn.BackgroundColor3 = Color3.fromRGB(35, 155, 75)
     ytGrad.Color = ColorSequence.new{
         ColorSequenceKeypoint.new(0, Color3.fromRGB(55, 180, 90)),
         ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 120, 50))
     }
     task.wait(2.5)
-    ytBtn.Text = "▶   Check New Updates"
+    ytBtn.Text = "▶  SCRIPT ANNOUNCEMENTS HERE"
     ytBtn.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
     ytGrad.Color = ColorSequence.new{
         ColorSequenceKeypoint.new(0, Color3.fromRGB(230, 55, 55)),
@@ -281,31 +326,13 @@ ytBtn.MouseButton1Click:Connect(function()
     }
 end)
 
--- ── Bottom spacer ──
-local spacer = Instance.new("Frame", body)
-spacer.Size = UDim2.new(1, 0, 0, 4)
-spacer.BackgroundTransparency = 1
-
--- ── Auto-size height ──
-local function updateSize()
-    local contentH = bodyLayout.AbsoluteContentSize.Y
-    local totalH = 52 + contentH + 10
-    f.Size = UDim2.new(FRAME_W_SCALE, 0, 0, totalH)
-    body.Size = UDim2.new(1, -24, 0, contentH)
-end
-
-bodyLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateSize)
-
 -- ── Entrance animation ──
 f.Size = UDim2.new(FRAME_W_SCALE, 0, 0, 0)
 f.BackgroundTransparency = 1
 f.Position = UDim2.new(0.5, 0, 1.5, 0)
 
-task.wait(0.12)
-updateSize()
-local targetH = 52 + bodyLayout.AbsoluteContentSize.Y + 10
+task.wait(0.15)
 T:Create(f, TweenInfo.new(0.65, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-    Size = UDim2.new(FRAME_W_SCALE, 0, 0, targetH),
     Position = UDim2.fromScale(0.5, 0.5),
     BackgroundTransparency = 0.08
 }):Play()
